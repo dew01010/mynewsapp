@@ -1,5 +1,6 @@
 package com.dew.newsapplication.network.apiservice
 
+import com.dew.newsapplication.utility.neworkutil.ApiResponse
 import com.dew.newsapplication.utility.neworkutil.NetworkInterceptor
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -36,4 +37,10 @@ object ApiFactory {
             return retrofit!!
 
         }
+
+   private val apiInterface = client.create(ApiInterface::class.java)
+    fun getApi():ApiInterface{
+        return apiInterface
+    }
+
 }
