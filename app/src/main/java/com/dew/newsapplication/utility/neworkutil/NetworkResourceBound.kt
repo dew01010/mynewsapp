@@ -96,4 +96,8 @@ abstract class NetworkResourceBound<CacheObject, RequestObject>(private val exec
     @NonNull
     @MainThread
     protected abstract fun createCall(): LiveData<ApiResponse<RequestObject>>
+
+    fun getAsLiveData():LiveData<Resources<CacheObject>>{
+        return mediatorLiveDataResult
+    }
 }

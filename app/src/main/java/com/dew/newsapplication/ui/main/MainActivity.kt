@@ -1,6 +1,7 @@
 package com.dew.newsapplication.ui.main
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.dew.newsapplication.databinding.ActivityMainBinding
@@ -11,7 +12,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
 
-    //private val viewModel by viewModels<NewsViewModel>()
+    private val viewModel by viewModels<NewsViewModel>()
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,5 +35,9 @@ class MainActivity : AppCompatActivity() {
             TabLayoutMediator.TabConfigurationStrategy{ tab, position ->
                 tab.text = getNewSource()[position].name
             }).attach()
+    }
+
+    fun performCacheMethod(view: View) {
+        viewModel.fetchHeadlines("google-news-in")
     }
 }

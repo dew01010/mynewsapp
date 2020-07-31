@@ -1,13 +1,12 @@
 package com.dew.newsapplication.cache
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import com.dew.newsapplication.cache.dao.NewsDao
 import com.dew.newsapplication.model.ArticleInfo
 
 @Database(entities = [ArticleInfo::class],version = 1)
+@TypeConverters(Converters::class)
 abstract class AppDatabase:RoomDatabase() {
 
     companion object{

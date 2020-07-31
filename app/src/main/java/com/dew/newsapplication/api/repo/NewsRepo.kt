@@ -1,7 +1,11 @@
 package com.dew.newsapplication.api.repo
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.dew.newsapplication.cache.AppDatabase
+import com.dew.newsapplication.cache.dao.NewsDao
 import com.dew.newsapplication.model.ArticleInfo
 import com.dew.newsapplication.model.HeadLineRes
 import com.dew.newsapplication.network.apiservice.ApiConstant
@@ -11,11 +15,14 @@ import com.dew.newsapplication.utility.neworkutil.ApiResponse
 import com.dew.newsapplication.utility.neworkutil.ApiResult
 import com.dew.newsapplication.utility.neworkutil.MyExecutor
 import com.dew.newsapplication.utility.neworkutil.NetworkResourceBound
+import com.msewa.healthism.util.Resources
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class NewsRepo {
+class NewsRepo(context: Context) {
+
+    private val newDao:NewsDao=AppDatabase.invoke(context =context ).getNewsDao()
     fun fetchNewsHeadlines(
         id: String,
         page: Int,
@@ -42,13 +49,12 @@ class NewsRepo {
     }
 
     fun fetchNewsHeadlinesWithCache(
-        id: String,
-        listener: (result: ApiResult<HeadLineRes>) -> Unit
-    ) {
-        object : NetworkResourceBound<ArrayList<ArticleInfo>, HeadLineRes>(MyExecutor) {
+        id: String
+    ): LiveData<Resources<ArrayList<ArticleInfo>>> {
+        return  object : NetworkResourceBound<ArrayList<ArticleInfo>, HeadLineRes>(MyExecutor) {
 
             override fun loadDatafromDb(): LiveData<ArrayList<ArticleInfo>> {
-                TODO("Not yet implemented")
+                return newDao.loadAllArticle()
             }
 
             override fun shouldFetch(data: ArrayList<ArticleInfo>): Boolean {
@@ -57,6 +63,21 @@ class NewsRepo {
 
             override fun saveCallResult(data: HeadLineRes) {
 
+                if(data.articles!=null){
+                    for((index:Int,rowId:Long) in newDao.insertNews(data.articles).withIndex()){
+                        Log.v("*1--","${rowId}")
+                        if(rowId == -1L){
+                            newDao.updateNews(
+                                data.articles[index].id,
+                                data.articles[index].author,
+                                data.articles[index].title,
+                                data.articles[index].url,
+                                data.articles[index].urlToImage,
+                                data.articles[index].publishedAt,
+                                data.articles[index].content)
+                        }
+                    }
+                }
             }
 
             override fun createCall(): LiveData<ApiResponse<HeadLineRes>> {
@@ -74,7 +95,7 @@ class NewsRepo {
                 return liveData
             }
 
-        }
+        }.getAsLiveData()
 
     }
 }
